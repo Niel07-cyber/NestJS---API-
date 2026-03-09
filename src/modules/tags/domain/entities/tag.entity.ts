@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import { TagName } from '../../../users/domain/value-objects/tag-name.value-object';
+import { TagName } from '../value-objects/tag-name.value-object';
 
 export class TagEntity {
   private _name: TagName;

@@ -1,4 +1,4 @@
-import { TagEntity } from '../../../tags/domain/entities/tag.entity';
+import { TagEntity } from '../entities/tag.entity';
 
 export abstract class TagRepository {
   public abstract findAll(): Promise<TagEntity[]>;
@@ -7,4 +7,6 @@ export abstract class TagRepository {
   public abstract createTag(tag: TagEntity): Promise<void>;
   public abstract updateTag(id: string, tag: TagEntity): Promise<void>;
   public abstract deleteTag(id: string): Promise<void>;
+  public abstract addTagToPost(postId: string, tagId: string): Promise<void>;
+  public abstract removeTagFromPost(postId: string, tagId: string): Promise<void>;
 }

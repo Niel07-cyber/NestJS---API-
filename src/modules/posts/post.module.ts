@@ -20,11 +20,15 @@ import { SQLitePostRepository } from './infrastructure/repositories/post.sqlite.
       useClass: SQLitePostRepository,
     },
 
+  
+
     CreatePostUseCase,
     UpdatePostUseCase,
     DeletePostUseCase,
     GetPostsUseCase,
     GetPostByIdUseCase,
   ],
+
+  exports: [PostRepository],
 })
 export class PostModule {}
