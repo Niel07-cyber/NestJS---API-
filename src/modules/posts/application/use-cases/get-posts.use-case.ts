@@ -10,11 +10,35 @@ export class GetPostsUseCase {
     private readonly loggingService: LoggingService,
   ) {}
 
- public async execute(tags?: string[]): Promise<PostEntity[]> {
-  this.loggingService.log('GetPostsUseCase.execute');
-  if (tags && tags.length > 0) {
-    return this.postRepository.getPostsByTags(tags);
+  public async execute(tags?: string[], user?: any): Promise<PostEntity[]> {
+    this.loggingService.log('GetPostsUseCase.execute');
+    
+    let posts: PostEntity[];
+    
+    if (tags && tags.length > 0) {
+      posts = await this.postRepository.getPostsByTags(tags);
+    } else {
+      posts = await this.postRepository.getPosts();
+    }
+
+   
+    if (!user) {
+      
+      return posts.filter(p => p.toJSON().status === 'accepted');
+    }
+
+    const role = user.role;
+    const userId = user.id;
+
+    if (role === 'moderator' || role === 'admin') {
+     
+      return posts;
+    }
+
+   
+    return posts.filter(p => {
+      const json = p.toJSON();
+      return json.status === 'accepted' || json.authorId === userId;
+    });
   }
-  return this.postRepository.getPosts();
-}
 }

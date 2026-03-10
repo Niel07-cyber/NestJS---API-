@@ -7,10 +7,11 @@ import {
   Patch,
   Post,
   UseGuards,
-    Query,
+  Query,
 } from '@nestjs/common';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
+import { JwtAuthOptionalGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth-optional.guard';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
 import { CreatePostDto } from '../../application/dtos/create-post.dto';
 import { UpdatePostDto } from '../../application/dtos/update-post.dto';
@@ -30,12 +31,16 @@ export class PostController {
     private readonly getPostByIdUseCase: GetPostByIdUseCase,
   ) {}
 
- @Get()
-public async getPosts(@Query('tags') tagsParam?: string) {
-  const tags = tagsParam ? tagsParam.split(',') : undefined;
-  const posts = await this.getPostsUseCase.execute(tags);
-  return posts.map((p) => p.toJSON());
-}
+  @Get()
+  @UseGuards(JwtAuthOptionalGuard)
+  public async getPosts(
+    @Requester() user: UserEntity,
+    @Query('tags') tagsParam?: string,
+  ) {
+    const tags = tagsParam ? tagsParam.split(',') : undefined;
+    const posts = await this.getPostsUseCase.execute(tags, user?.toJSON());
+    return posts.map((p) => p.toJSON());
+  }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
@@ -44,7 +49,6 @@ public async getPosts(@Query('tags') tagsParam?: string) {
     @Param('id') id: string,
   ) {
     const post = await this.getPostByIdUseCase.execute(id, user);
-
     return post?.toJSON();
   }
 
