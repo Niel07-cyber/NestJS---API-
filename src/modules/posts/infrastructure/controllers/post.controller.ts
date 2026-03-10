@@ -38,8 +38,7 @@ export class PostController {
     @Query('tags') tagsParam?: string,
   ) {
     const tags = tagsParam ? tagsParam.split(',') : undefined;
-    const posts = await this.getPostsUseCase.execute(tags, user?.toJSON());
-    return posts.map((p) => p.toJSON());
+    return this.getPostsUseCase.execute(tags, user?.toJSON());
   }
 
   @Get(':id')

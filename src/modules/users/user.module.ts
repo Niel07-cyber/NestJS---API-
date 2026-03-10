@@ -23,5 +23,7 @@ import { SQLiteUserRepository } from './infrastructure/repositories/user.sqlite.
     ListUsersUseCase,
     GetUserByIdUseCase,
   ],
+
+  exports: [UserRepository],
 })
 export class UserModule {}

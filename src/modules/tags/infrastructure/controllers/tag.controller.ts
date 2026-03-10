@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
   UseGuards,
-    HttpCode,
+  HttpCode,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
@@ -44,10 +44,7 @@ export class TagController {
     @Requester() user: UserEntity,
     @Body() input: CreateTagDto,
   ) {
-    if (user.toJSON().role !== 'admin') {
-      return { statusCode: 403, message: 'Forbidden' };
-    }
-    const tag = await this.createTagUseCase.execute(input);
+    const tag = await this.createTagUseCase.execute(input, user);
     return tag.toJSON();
   }
 
@@ -58,47 +55,40 @@ export class TagController {
     @Param('id') id: string,
     @Body() input: UpdateTagDto,
   ) {
-    if (user.toJSON().role !== 'admin') {
-      return { statusCode: 403, message: 'Forbidden' };
-    }
-    const tag = await this.updateTagUseCase.execute(id, input);
+    const tag = await this.updateTagUseCase.execute(id, input, user);
     return tag.toJSON();
   }
 
   @Delete('tags/:id')
   @UseGuards(JwtAuthGuard)
-    @HttpCode(204)
+  @HttpCode(204)
   public async deleteTag(
     @Requester() user: UserEntity,
     @Param('id') id: string,
   ) {
-    if (user.toJSON().role !== 'admin') {
-      return { statusCode: 403, message: 'Forbidden' };
-    }
-    await this.deleteTagUseCase.execute(id);
+    await this.deleteTagUseCase.execute(id, user);
   }
 
   @Post('posts/:postId/tags/:tagId')
-@UseGuards(JwtAuthGuard)
-@HttpCode(200)
-public async addTagToPost(
-  @Requester() user: UserEntity,
-  @Param('postId') postId: string,
-  @Param('tagId') tagId: string,
-) {
-  const post = await this.addTagToPostUseCase.execute(postId, tagId, user);
-  return post.toJSON();
-}
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  public async addTagToPost(
+    @Requester() user: UserEntity,
+    @Param('postId') postId: string,
+    @Param('tagId') tagId: string,
+  ) {
+    const post = await this.addTagToPostUseCase.execute(postId, tagId, user);
+    return post.toJSON();
+  }
 
-@Delete('posts/:postId/tags/:tagId')
-@UseGuards(JwtAuthGuard)
-@HttpCode(204)
-public async removeTagFromPost(
-  @Requester() user: UserEntity,
-  @Param('postId') postId: string,
-  @Param('tagId') tagId: string,
-) {
-  await this.removeTagFromPostUseCase.execute(postId, tagId, user);
-}
-
+  @Delete('posts/:postId/tags/:tagId')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
+  public async removeTagFromPost(
+    @Requester() user: UserEntity,
+    @Param('postId') postId: string,
+    @Param('tagId') tagId: string,
+  ) {
+    await this.removeTagFromPostUseCase.execute(postId, tagId, user);
+  }
 }
