@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   UseGuards,
+    Query,
 } from '@nestjs/common';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
@@ -29,12 +30,12 @@ export class PostController {
     private readonly getPostByIdUseCase: GetPostByIdUseCase,
   ) {}
 
-  @Get()
-  public async getPosts() {
-    const posts = await this.getPostsUseCase.execute();
-
-    return posts.map((p) => p.toJSON());
-  }
+ @Get()
+public async getPosts(@Query('tags') tagsParam?: string) {
+  const tags = tagsParam ? tagsParam.split(',') : undefined;
+  const posts = await this.getPostsUseCase.execute(tags);
+  return posts.map((p) => p.toJSON());
+}
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)

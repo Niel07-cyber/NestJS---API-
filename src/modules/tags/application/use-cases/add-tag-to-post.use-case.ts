@@ -5,6 +5,7 @@ import { TagRepository } from '../../domain/repositories/tag.repository';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
 import { PostNotFoundException } from '../../../posts/domain/exceptions/post-not-found.exception';
 import { ForbiddenDomainException } from '../../../shared/errors/domain/exceptions/forbidden.exception';
+import { TagAlreadyAssociatedException } from '../../domain/exceptions/tag-already-associated.exception';
 
 @Injectable()
 export class AddTagToPostUseCase {
@@ -25,6 +26,10 @@ export class AddTagToPostUseCase {
     const tag = await this.tagRepository.findById(tagId);
     if (!tag) {
       throw new TagNotFoundException();
+    }
+    const isAssociated = await this.tagRepository.isTagAssociatedWithPost(postId, tagId);
+    if (isAssociated) {
+      throw new TagAlreadyAssociatedException();
     }
     await this.tagRepository.addTagToPost(postId, tagId);
     return this.postRepository.getPostById(postId);

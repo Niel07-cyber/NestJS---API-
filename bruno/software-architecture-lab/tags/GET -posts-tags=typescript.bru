@@ -1,0 +1,19 @@
+meta {
+  name: GET /posts?tags=typescript
+  type: http
+  seq: 7
+}
+
+get {
+  url: http://localhost:3000/posts?tags=typescript
+  body: none
+  auth: inherit
+}
+
+params:query {
+  tags: typescript
+}
+
+settings {
+  encodeUrl: true
+}

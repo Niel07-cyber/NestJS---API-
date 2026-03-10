@@ -35,4 +35,15 @@ export class SQLitePostRepository implements PostRepository {
   public async deletePost(id: string): Promise<void> {
     await this.dataSource.getRepository(SQLitePostEntity).delete(id);
   }
+
+
+  public async getPostsByTags(tags: string[]): Promise<PostEntity[]> {
+  const data = await this.dataSource
+    .getRepository(SQLitePostEntity)
+    .createQueryBuilder('post')
+    .leftJoinAndSelect('post.tags', 'tag')
+    .where('tag.name IN (:...tags)', { tags })
+    .getMany();
+  return data.map((post) => PostEntity.reconstitute({ ...post }));
+}
 }

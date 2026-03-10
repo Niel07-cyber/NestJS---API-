@@ -31,5 +31,7 @@ export abstract class PostRepository {
     input: PostEntity,
   ): void | Promise<void>;
 
-  public abstract deletePost(id: string): void | Promise<void>;
+ public abstract deletePost(id: string): void | Promise<void>;
+  
+  public abstract getPostsByTags(tags: string[]): PostEntity[] | Promise<PostEntity[]>;
 }

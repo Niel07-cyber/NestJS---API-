@@ -9,4 +9,5 @@ export abstract class TagRepository {
   public abstract deleteTag(id: string): Promise<void>;
   public abstract addTagToPost(postId: string, tagId: string): Promise<void>;
   public abstract removeTagFromPost(postId: string, tagId: string): Promise<void>;
+  public abstract isTagAssociatedWithPost(postId: string, tagId: string): Promise<boolean>;
 }

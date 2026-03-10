@@ -56,4 +56,14 @@ export class SQLiteTagRepository implements TagRepository {
       .of(tagId)
       .remove(postId);
   }
+
+public async isTagAssociatedWithPost(postId: string, tagId: string): Promise<boolean> {
+  const result = await this.dataSource
+    .createQueryBuilder()
+    .select('1')
+    .from('post_tags', 'pt')
+    .where('pt."postId" = :postId AND pt."tagId" = :tagId', { postId, tagId })
+    .getRawOne();
+  return !!result;
+}
 }

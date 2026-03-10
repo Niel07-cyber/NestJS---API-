@@ -36,4 +36,12 @@ export class InMemoryPostRepository implements PostRepository {
   public deletePost(id: string) {
     this.posts = this.posts.filter((post) => post.id !== id);
   }
+
+  public getPostsByTags(tags: string[]): PostEntity[] {
+    return this.posts
+      .filter((post: any) => 
+        post.tags && post.tags.some((tag: any) => tags.includes(tag.name))
+      )
+      .map((post) => PostEntity.reconstitute(post));
+  }
 }
