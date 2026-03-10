@@ -9,6 +9,8 @@ export class PostEntity {
   private _content: PostContent;
   private _authorId: string;
   private _status: PostStatus;
+  private _tags: { id: string; name: string }[];
+
 
   private constructor(
     readonly id: string,
@@ -16,11 +18,13 @@ export class PostEntity {
     content: PostContent,
     authorId: string,
     status: PostStatus,
+    tags: { id: string; name: string }[] = [],
   ) {
     this._title = title;
     this._content = content;
     this._authorId = authorId;
     this._status = status;
+     this._tags = tags;
   }
 
   public get status() {
@@ -38,6 +42,7 @@ export class PostEntity {
       new PostContent(input.content as string),
       input.authorId as string,
       input.status as PostStatus,
+      (input.tags as { id: string; name: string }[]) ?? [],
     );
   }
 
@@ -48,6 +53,7 @@ export class PostEntity {
       content: this._content.toString(),
       status: this._status,
       authorId: this._authorId,
+      tags: this._tags ?? [],
     };
   }
 

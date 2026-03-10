@@ -1,0 +1,24 @@
+meta {
+  name: POST /tags
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/tags
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMzM5YWFiMC04YmRjLTRhNWUtYWY4NS1hMmI4ODUxYjQ4MTkiLCJpZCI6IjAzMzlhYWIwLThiZGMtNGE1ZS1hZjg1LWEyYjg4NTFiNDgxOSIsInJvbGUiOiJhZG1pbiIsInVzZXJuYW1lIjoiZ2VyYWxkIiwicGFzc3dvcmQiOiJnZXJhbGQiLCJpYXQiOjE3NzMxNTE5NzAsImV4cCI6MTc3MzE1NTU3MH0.zXUgg658VprhwmJ80ThYT-sXx4j_kLOeDzfdhxCfQsM
+}
+
+body:json {
+  {"name": "typescript"}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

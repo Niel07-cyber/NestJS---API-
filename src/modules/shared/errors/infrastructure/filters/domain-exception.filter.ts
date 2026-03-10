@@ -30,6 +30,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
       POST_NOT_FOUND: 404,
       TAG_ALREADY_EXISTS: 409,
       TAG_NOT_FOUND: 404,
+      FORBIDDEN: 403,
     };
     return statusMap[code] || 400;
   }

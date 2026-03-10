@@ -9,7 +9,7 @@ export class SQLitePostRepository implements PostRepository {
   constructor(private readonly dataSource: DataSource) {}
 
   public async getPosts(): Promise<PostEntity[]> {
-    const data = await this.dataSource.getRepository(SQLitePostEntity).find();
+    const data = await this.dataSource.getRepository(SQLitePostEntity).find({ relations: ['tags'] });
 
     return data.map((post) => PostEntity.reconstitute({ ...post }));
   }
@@ -17,7 +17,7 @@ export class SQLitePostRepository implements PostRepository {
   public async getPostById(id: string): Promise<PostEntity | undefined> {
     const post = await this.dataSource
       .getRepository(SQLitePostEntity)
-      .findOne({ where: { id } });
+      .findOne({ where: { id }, relations: ['tags'] });
 
     return post ? PostEntity.reconstitute({ ...post }) : undefined;
   }

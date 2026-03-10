@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   UseGuards,
+    HttpCode,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
@@ -66,6 +67,7 @@ export class TagController {
 
   @Delete('tags/:id')
   @UseGuards(JwtAuthGuard)
+    @HttpCode(204)
   public async deleteTag(
     @Requester() user: UserEntity,
     @Param('id') id: string,
@@ -77,20 +79,26 @@ export class TagController {
   }
 
   @Post('posts/:postId/tags/:tagId')
-  @UseGuards(JwtAuthGuard)
-  public async addTagToPost(
-    @Param('postId') postId: string,
-    @Param('tagId') tagId: string,
-  ) {
-    await this.addTagToPostUseCase.execute(postId, tagId);
-  }
+@UseGuards(JwtAuthGuard)
+@HttpCode(200)
+public async addTagToPost(
+  @Requester() user: UserEntity,
+  @Param('postId') postId: string,
+  @Param('tagId') tagId: string,
+) {
+  const post = await this.addTagToPostUseCase.execute(postId, tagId, user);
+  return post.toJSON();
+}
 
-  @Delete('posts/:postId/tags/:tagId')
-  @UseGuards(JwtAuthGuard)
-  public async removeTagFromPost(
-    @Param('postId') postId: string,
-    @Param('tagId') tagId: string,
-  ) {
-    await this.removeTagFromPostUseCase.execute(postId, tagId);
-  }
+@Delete('posts/:postId/tags/:tagId')
+@UseGuards(JwtAuthGuard)
+@HttpCode(204)
+public async removeTagFromPost(
+  @Requester() user: UserEntity,
+  @Param('postId') postId: string,
+  @Param('tagId') tagId: string,
+) {
+  await this.removeTagFromPostUseCase.execute(postId, tagId, user);
+}
+
 }
