@@ -10,7 +10,6 @@ export class SQLitePostRepository implements PostRepository {
 
   public async getPosts(): Promise<PostEntity[]> {
     const data = await this.dataSource.getRepository(SQLitePostEntity).find({ relations: ['tags'] });
-
     return data.map((post) => PostEntity.reconstitute({ ...post }));
   }
 
@@ -18,7 +17,6 @@ export class SQLitePostRepository implements PostRepository {
     const post = await this.dataSource
       .getRepository(SQLitePostEntity)
       .findOne({ where: { id }, relations: ['tags'] });
-
     return post ? PostEntity.reconstitute({ ...post }) : undefined;
   }
 
@@ -27,23 +25,23 @@ export class SQLitePostRepository implements PostRepository {
   }
 
   public async updatePost(id: string, input: PostEntity): Promise<void> {
+    const { tags, ...postData } = input.toJSON() as any;
     await this.dataSource
       .getRepository(SQLitePostEntity)
-      .update(id, input.toJSON());
+      .update(id, postData);
   }
 
   public async deletePost(id: string): Promise<void> {
     await this.dataSource.getRepository(SQLitePostEntity).delete(id);
   }
 
-
   public async getPostsByTags(tags: string[]): Promise<PostEntity[]> {
-  const data = await this.dataSource
-    .getRepository(SQLitePostEntity)
-    .createQueryBuilder('post')
-    .leftJoinAndSelect('post.tags', 'tag')
-    .where('tag.name IN (:...tags)', { tags })
-    .getMany();
-  return data.map((post) => PostEntity.reconstitute({ ...post }));
-}
+    const data = await this.dataSource
+      .getRepository(SQLitePostEntity)
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.tags', 'tag')
+      .where('tag.name IN (:...tags)', { tags })
+      .getMany();
+    return data.map((post) => PostEntity.reconstitute({ ...post }));
+  }
 }

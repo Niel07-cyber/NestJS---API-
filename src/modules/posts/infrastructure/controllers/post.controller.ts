@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -20,6 +21,9 @@ import { DeletePostUseCase } from '../../application/use-cases/delete-post.use-c
 import { GetPostByIdUseCase } from '../../application/use-cases/get-post-by-id.use-case';
 import { GetPostsUseCase } from '../../application/use-cases/get-posts.use-case';
 import { UpdatePostUseCase } from '../../application/use-cases/update-post.use-case';
+import { SubmitPostForReviewUseCase } from '../../application/use-cases/submit-post-for-review.use-case';
+import { ApprovePostUseCase } from '../../application/use-cases/approve-post.use-case';
+import { RejectPostUseCase } from '../../application/use-cases/reject-post.use-case';
 
 @Controller('posts')
 export class PostController {
@@ -29,6 +33,9 @@ export class PostController {
     private readonly deletePostUseCase: DeletePostUseCase,
     private readonly getPostsUseCase: GetPostsUseCase,
     private readonly getPostByIdUseCase: GetPostByIdUseCase,
+    private readonly submitPostForReviewUseCase: SubmitPostForReviewUseCase,
+    private readonly approvePostUseCase: ApprovePostUseCase,
+    private readonly rejectPostUseCase: RejectPostUseCase,
   ) {}
 
   @Get()
@@ -74,5 +81,35 @@ export class PostController {
   @Delete(':id')
   public async deletePost(@Param('id') id: string) {
     return this.deletePostUseCase.execute(id);
+  }
+
+  @Post(':id/submit-for-review')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  public async submitForReview(
+    @Requester() user: UserEntity,
+    @Param('id') id: string,
+  ) {
+    await this.submitPostForReviewUseCase.execute(id, user);
+  }
+
+  @Post(':id/approve')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  public async approvePost(
+    @Requester() user: UserEntity,
+    @Param('id') id: string,
+  ) {
+    await this.approvePostUseCase.execute(id, user);
+  }
+
+  @Post(':id/reject')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  public async rejectPost(
+    @Requester() user: UserEntity,
+    @Param('id') id: string,
+  ) {
+    await this.rejectPostUseCase.execute(id, user);
   }
 }

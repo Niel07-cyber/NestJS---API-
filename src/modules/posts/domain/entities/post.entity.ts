@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 import { PostContent } from '../value-objects/post-content.value-object';
 import { PostTitle } from '../value-objects/post-title.value-object';
+import { InvalidPostTransitionException } from '../exceptions/invalid-post-transition.exception';
 
 export type PostStatus = 'draft' | 'waiting' | 'accepted' | 'rejected';
 
@@ -80,4 +81,27 @@ export class PostEntity {
       this._content = new PostContent(content);
     }
   }
+
+
+
+  public submitForReview(): void {
+  if (this._status !== 'draft') {
+    throw new InvalidPostTransitionException();
+  }
+  this._status = 'waiting';
+}
+
+public approve(): void {
+  if (this._status !== 'waiting') {
+    throw new InvalidPostTransitionException();
+  }
+  this._status = 'accepted';
+}
+
+public reject(): void {
+  if (this._status !== 'waiting') {
+    throw new InvalidPostTransitionException();
+  }
+  this._status = 'rejected';
+}
 }
