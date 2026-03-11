@@ -51,26 +51,19 @@ export class PostController {
     const tags = tagsParam ? tagsParam.split(',') : undefined;
     return this.getPostsUseCase.execute(tags, user?.toJSON());
   }
-
-  @Get('slug/:slug')
-  @UseGuards(JwtAuthOptionalGuard)
-  public async getPostBySlug(
-    @Requester() user: UserEntity,
-    @Param('slug') slug: string,
-  ) {
-    const post = await this.getPostBySlugUseCase.execute(slug, user?.toJSON());
-    return post.toJSON();
+@Get(':idOrSlug')
+@UseGuards(JwtAuthOptionalGuard)
+public async getPost(
+  @Requester() user: UserEntity,
+  @Param('idOrSlug') idOrSlug: string,
+) {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(idOrSlug);
+  if (isUuid) {
+    return this.getPostByIdUseCase.execute(idOrSlug, user);
+  } else {
+    return this.getPostBySlugUseCase.execute(idOrSlug, user?.toJSON());
   }
-
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  public async getPostById(
-    @Requester() user: UserEntity,
-    @Param('id') id: string,
-  ) {
-    const post = await this.getPostByIdUseCase.execute(id, user);
-    return post?.toJSON();
-  }
+}
 
   @Post()
   @UseGuards(JwtAuthGuard)
