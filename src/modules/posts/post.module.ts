@@ -10,6 +10,8 @@ import { UpdatePostUseCase } from './application/use-cases/update-post.use-case'
 import { SubmitPostForReviewUseCase } from './application/use-cases/submit-post-for-review.use-case';
 import { ApprovePostUseCase } from './application/use-cases/approve-post.use-case';
 import { RejectPostUseCase } from './application/use-cases/reject-post.use-case';
+import { GetPostBySlugUseCase } from './application/use-cases/get-post-by-slug.use-case';
+import { UpdatePostSlugUseCase } from './application/use-cases/update-post-slug.use-case';
 import { PostRepository } from './domain/repositories/post.repository';
 import { PostController } from './infrastructure/controllers/post.controller';
 import { SQLitePostRepository } from './infrastructure/repositories/post.sqlite.repository';
@@ -30,6 +32,8 @@ import { SQLitePostRepository } from './infrastructure/repositories/post.sqlite.
     SubmitPostForReviewUseCase,
     ApprovePostUseCase,
     RejectPostUseCase,
+    GetPostBySlugUseCase,
+    UpdatePostSlugUseCase,
   ],
   exports: [PostRepository],
 })

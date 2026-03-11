@@ -37,6 +37,11 @@ export class InMemoryPostRepository implements PostRepository {
     this.posts = this.posts.filter((post) => post.id !== id);
   }
 
+  public findBySlug(slug: string): PostEntity | undefined {
+  const post = this.posts.find((p: any) => p.slug === slug);
+  return post ? PostEntity.reconstitute(post) : undefined;
+}
+
   public getPostsByTags(tags: string[]): PostEntity[] {
     return this.posts
       .filter((post: any) => 

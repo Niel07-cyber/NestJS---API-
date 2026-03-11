@@ -24,6 +24,8 @@ import { UpdatePostUseCase } from '../../application/use-cases/update-post.use-c
 import { SubmitPostForReviewUseCase } from '../../application/use-cases/submit-post-for-review.use-case';
 import { ApprovePostUseCase } from '../../application/use-cases/approve-post.use-case';
 import { RejectPostUseCase } from '../../application/use-cases/reject-post.use-case';
+import { GetPostBySlugUseCase } from '../../application/use-cases/get-post-by-slug.use-case';
+import { UpdatePostSlugUseCase } from '../../application/use-cases/update-post-slug.use-case';
 
 @Controller('posts')
 export class PostController {
@@ -36,6 +38,8 @@ export class PostController {
     private readonly submitPostForReviewUseCase: SubmitPostForReviewUseCase,
     private readonly approvePostUseCase: ApprovePostUseCase,
     private readonly rejectPostUseCase: RejectPostUseCase,
+    private readonly getPostBySlugUseCase: GetPostBySlugUseCase,
+    private readonly updatePostSlugUseCase: UpdatePostSlugUseCase,
   ) {}
 
   @Get()
@@ -46,6 +50,16 @@ export class PostController {
   ) {
     const tags = tagsParam ? tagsParam.split(',') : undefined;
     return this.getPostsUseCase.execute(tags, user?.toJSON());
+  }
+
+  @Get('slug/:slug')
+  @UseGuards(JwtAuthOptionalGuard)
+  public async getPostBySlug(
+    @Requester() user: UserEntity,
+    @Param('slug') slug: string,
+  ) {
+    const post = await this.getPostBySlugUseCase.execute(slug, user?.toJSON());
+    return post.toJSON();
   }
 
   @Get(':id')
@@ -68,6 +82,17 @@ export class PostController {
       { ...input, authorId: user.id },
       user,
     );
+  }
+
+  @Patch(':id/slug')
+  @UseGuards(JwtAuthGuard)
+  public async updatePostSlug(
+    @Requester() user: UserEntity,
+    @Param('id') id: string,
+    @Body() body: { slug: string },
+  ) {
+    const post = await this.updatePostSlugUseCase.execute(id, body.slug, user);
+    return post.toJSON();
   }
 
   @Patch(':id')
