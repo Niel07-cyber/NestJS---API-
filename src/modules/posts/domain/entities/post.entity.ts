@@ -12,6 +12,9 @@ export class PostEntity {
   private _status: PostStatus;
   private _tags: { id: string; name: string }[];
   private _slug: string;
+  private _createdAt: Date;
+  private _updatedAt: Date;
+  private _publishedAt: Date | null;
 
   private constructor(
     readonly id: string,
@@ -21,6 +24,9 @@ export class PostEntity {
     status: PostStatus,
     tags: { id: string; name: string }[] = [],
     slug: string = '',
+    createdAt: Date = new Date(),
+    updatedAt: Date = new Date(),
+    publishedAt: Date | null = null,
   ) {
     this._title = title;
     this._content = content;
@@ -28,6 +34,9 @@ export class PostEntity {
     this._status = status;
     this._tags = tags;
     this._slug = slug;
+    this._createdAt = createdAt;
+    this._updatedAt = updatedAt;
+    this._publishedAt = publishedAt;
   }
 
   public get status() {
@@ -51,6 +60,9 @@ export class PostEntity {
       input.status as PostStatus,
       (input.tags as { id: string; name: string }[]) ?? [],
       (input.slug as string) ?? '',
+      input.createdAt ? new Date(input.createdAt as string) : new Date(),
+      input.updatedAt ? new Date(input.updatedAt as string) : new Date(),
+      input.publishedAt ? new Date(input.publishedAt as string) : null,
     );
   }
 
@@ -63,6 +75,9 @@ export class PostEntity {
       authorId: this._authorId,
       slug: this._slug,
       tags: this._tags ?? [],
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+      publishedAt: this._publishedAt,
     };
   }
 
@@ -72,6 +87,7 @@ export class PostEntity {
     authorId: string,
     slug: string = '',
   ): PostEntity {
+    const now = new Date();
     return new PostEntity(
       v4(),
       new PostTitle(title),
@@ -80,6 +96,9 @@ export class PostEntity {
       'draft',
       [],
       slug,
+      now,
+      now,
+      null,
     );
   }
 
@@ -90,10 +109,12 @@ export class PostEntity {
     if (content) {
       this._content = new PostContent(content);
     }
+    this._updatedAt = new Date();
   }
 
   public updateSlug(slug: string): void {
     this._slug = slug;
+    this._updatedAt = new Date();
   }
 
   public submitForReview(): void {
@@ -101,6 +122,7 @@ export class PostEntity {
       throw new InvalidPostTransitionException();
     }
     this._status = 'waiting';
+    this._updatedAt = new Date();
   }
 
   public approve(): void {
@@ -108,6 +130,8 @@ export class PostEntity {
       throw new InvalidPostTransitionException();
     }
     this._status = 'accepted';
+    this._publishedAt = new Date();
+    this._updatedAt = new Date();
   }
 
   public reject(): void {
@@ -115,5 +139,6 @@ export class PostEntity {
       throw new InvalidPostTransitionException();
     }
     this._status = 'rejected';
+    this._updatedAt = new Date();
   }
 }
