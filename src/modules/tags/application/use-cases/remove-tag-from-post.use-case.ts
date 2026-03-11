@@ -26,6 +26,10 @@ export class RemoveTagFromPostUseCase {
     if (!tag) {
       throw new TagNotFoundException();
     }
+    const isAssociated = await this.tagRepository.isTagAssociatedWithPost(postId, tagId);
+    if (!isAssociated) {
+      throw new TagNotFoundException();
+    }
     await this.tagRepository.removeTagFromPost(postId, tagId);
   }
 }

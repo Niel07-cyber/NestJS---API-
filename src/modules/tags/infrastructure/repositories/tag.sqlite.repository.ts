@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { TagEntity } from '../../domain/entities/tag.entity';
 import { TagRepository } from '../../domain/repositories/tag.repository';
 import { SQLiteTagEntity } from '../entities/tag.sqlite.entity';
+import { SQLitePostEntity } from '../../../posts/infrastructure/entities/post.sqlite.entity';
 
 @Injectable()
 export class SQLiteTagRepository implements TagRepository {
@@ -34,7 +35,7 @@ export class SQLiteTagRepository implements TagRepository {
   public async updateTag(id: string, tag: TagEntity): Promise<void> {
     await this.dataSource
       .getRepository(SQLiteTagEntity)
-      .update(id, { name: tag.name });
+      .update(id, tag.toJSON());
   }
 
   public async deleteTag(id: string): Promise<void> {
@@ -44,26 +45,35 @@ export class SQLiteTagRepository implements TagRepository {
   public async addTagToPost(postId: string, tagId: string): Promise<void> {
     await this.dataSource
       .createQueryBuilder()
-      .relation(SQLiteTagEntity, 'posts')
-      .of(tagId)
-      .add(postId);
+      .relation(SQLitePostEntity, 'tags')
+      .of(postId)
+      .add(tagId);
   }
 
   public async removeTagFromPost(postId: string, tagId: string): Promise<void> {
     await this.dataSource
       .createQueryBuilder()
-      .relation(SQLiteTagEntity, 'posts')
-      .of(tagId)
-      .remove(postId);
+      .relation(SQLitePostEntity, 'tags')
+      .of(postId)
+      .remove(tagId);
   }
 
-public async isTagAssociatedWithPost(postId: string, tagId: string): Promise<boolean> {
-  const result = await this.dataSource
+  public async isTagAssociatedWithPost(postId: string, tagId: string): Promise<boolean> {
+    const result = await this.dataSource
+      .createQueryBuilder()
+      .select('1')
+      .from('post_tags', 'pt')
+      .where('pt."postId" = :postId AND pt."tagId" = :tagId', { postId, tagId })
+      .getRawOne();
+    return !!result;
+  }
+
+  public async removeAllPostAssociations(tagId: string): Promise<void> {
+  await this.dataSource
     .createQueryBuilder()
-    .select('1')
-    .from('post_tags', 'pt')
-    .where('pt."postId" = :postId AND pt."tagId" = :tagId', { postId, tagId })
-    .getRawOne();
-  return !!result;
+    .delete()
+    .from('post_tags')
+    .where('"tagId" = :tagId', { tagId })
+    .execute();
 }
 }

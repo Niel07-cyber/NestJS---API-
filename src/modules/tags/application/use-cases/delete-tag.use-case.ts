@@ -16,6 +16,7 @@ export class DeleteTagUseCase {
     if (!tag) {
       throw new TagNotFoundException();
     }
+    await this.tagRepository.removeAllPostAssociations(id);
     await this.tagRepository.deleteTag(id);
   }
 }
