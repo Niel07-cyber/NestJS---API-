@@ -9,7 +9,6 @@ export class DomainExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest();
     const status = this.getHttpStatus(exception.code);
-
     response.status(status).json({
       statusCode: status,
       error: exception.code,
@@ -21,23 +20,27 @@ export class DomainExceptionFilter implements ExceptionFilter {
 
   private getHttpStatus(code: string): number {
     const statusMap: Record<string, number> = {
-  USER_CANNOT_CREATE_POST: 403,
-  USER_CANNOT_UPDATE_POST: 403,
-  USER_CANNOT_DELETE_POST: 403,
-  POST_ALREADY_PUBLISHED: 400,
-  INVALID_TITLE: 400,
-  INVALID_CONTENT: 400,
-  POST_NOT_FOUND: 404,
-  TAG_ALREADY_EXISTS: 409,
-  TAG_NOT_FOUND: 404,
-  FORBIDDEN: 403,
-  TAG_ALREADY_ASSOCIATED: 409,
-  INVALID_POST_TRANSITION: 400,
-  NOT_POST_AUTHOR: 403,
-  NOT_MODERATOR: 403,
-  SLUG_ALREADY_EXISTS: 409,
-  INVALID_SLUG: 400,
-};
+      USER_CANNOT_CREATE_POST: 403,
+      USER_CANNOT_UPDATE_POST: 403,
+      USER_CANNOT_DELETE_POST: 403,
+      POST_ALREADY_PUBLISHED: 400,
+      INVALID_TITLE: 400,
+      INVALID_CONTENT: 400,
+      POST_NOT_FOUND: 404,
+      TAG_ALREADY_EXISTS: 409,
+      TAG_NOT_FOUND: 404,
+      FORBIDDEN: 403,
+      TAG_ALREADY_ASSOCIATED: 409,
+      INVALID_POST_TRANSITION: 400,
+      NOT_POST_AUTHOR: 403,
+      NOT_MODERATOR: 403,
+      SLUG_ALREADY_EXISTS: 409,
+      INVALID_SLUG: 400,
+      COMMENT_NOT_FOUND: 404,
+      INVALID_COMMENT_CONTENT: 400,
+      CANNOT_DELETE_COMMENT: 403,
+      POST_NOT_ACCEPTED: 403,
+    };
     return statusMap[code] || 400;
   }
 }

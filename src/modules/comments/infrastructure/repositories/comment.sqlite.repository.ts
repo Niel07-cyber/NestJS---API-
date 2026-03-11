@@ -6,7 +6,9 @@ import { SQLiteCommentEntity } from '../entities/comment.sqlite.entity';
 
 @Injectable()
 export class SQLiteCommentRepository extends CommentRepository {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(private readonly dataSource: DataSource) {
+    super();
+  }
 
   public async createComment(comment: CommentEntity): Promise<void> {
     const json = comment.toJSON();
