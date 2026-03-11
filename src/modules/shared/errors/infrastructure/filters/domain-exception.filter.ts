@@ -35,6 +35,8 @@ export class DomainExceptionFilter implements ExceptionFilter {
   INVALID_POST_TRANSITION: 400,
   NOT_POST_AUTHOR: 403,
   NOT_MODERATOR: 403,
+  SLUG_ALREADY_EXISTS: 409,
+  INVALID_SLUG: 400,
 };
     return statusMap[code] || 400;
   }

@@ -11,7 +11,7 @@ export class PostEntity {
   private _authorId: string;
   private _status: PostStatus;
   private _tags: { id: string; name: string }[];
-
+  private _slug: string;
 
   private constructor(
     readonly id: string,
@@ -20,12 +20,14 @@ export class PostEntity {
     authorId: string,
     status: PostStatus,
     tags: { id: string; name: string }[] = [],
+    slug: string = '',
   ) {
     this._title = title;
     this._content = content;
     this._authorId = authorId;
     this._status = status;
-     this._tags = tags;
+    this._tags = tags;
+    this._slug = slug;
   }
 
   public get status() {
@@ -36,6 +38,10 @@ export class PostEntity {
     return this._authorId;
   }
 
+  public get slug() {
+    return this._slug;
+  }
+
   public static reconstitute(input: Record<string, unknown>) {
     return new PostEntity(
       input.id as string,
@@ -44,6 +50,7 @@ export class PostEntity {
       input.authorId as string,
       input.status as PostStatus,
       (input.tags as { id: string; name: string }[]) ?? [],
+      (input.slug as string) ?? '',
     );
   }
 
@@ -54,6 +61,7 @@ export class PostEntity {
       content: this._content.toString(),
       status: this._status,
       authorId: this._authorId,
+      slug: this._slug,
       tags: this._tags ?? [],
     };
   }
@@ -62,6 +70,7 @@ export class PostEntity {
     title: string,
     content: string,
     authorId: string,
+    slug: string = '',
   ): PostEntity {
     return new PostEntity(
       v4(),
@@ -69,6 +78,8 @@ export class PostEntity {
       new PostContent(content),
       authorId,
       'draft',
+      [],
+      slug,
     );
   }
 
@@ -76,32 +87,33 @@ export class PostEntity {
     if (title) {
       this._title = new PostTitle(title);
     }
-
     if (content) {
       this._content = new PostContent(content);
     }
   }
 
-
+  public updateSlug(slug: string): void {
+    this._slug = slug;
+  }
 
   public submitForReview(): void {
-  if (this._status !== 'draft') {
-    throw new InvalidPostTransitionException();
+    if (this._status !== 'draft') {
+      throw new InvalidPostTransitionException();
+    }
+    this._status = 'waiting';
   }
-  this._status = 'waiting';
-}
 
-public approve(): void {
-  if (this._status !== 'waiting') {
-    throw new InvalidPostTransitionException();
+  public approve(): void {
+    if (this._status !== 'waiting') {
+      throw new InvalidPostTransitionException();
+    }
+    this._status = 'accepted';
   }
-  this._status = 'accepted';
-}
 
-public reject(): void {
-  if (this._status !== 'waiting') {
-    throw new InvalidPostTransitionException();
+  public reject(): void {
+    if (this._status !== 'waiting') {
+      throw new InvalidPostTransitionException();
+    }
+    this._status = 'rejected';
   }
-  this._status = 'rejected';
-}
 }
