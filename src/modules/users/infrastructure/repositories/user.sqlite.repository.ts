@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { UserEntity } from '../../domain/entities/user.entity';
+import { UserEntity, UserRole } from '../../domain/entities/user.entity';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { SQLiteUserEntity } from '../entities/user.sqlite.entity';
 
@@ -10,7 +10,6 @@ export class SQLiteUserRepository implements UserRepository {
 
   public async listUsers(): Promise<UserEntity[]> {
     const users = await this.dataSource.getRepository(SQLiteUserEntity).find();
-
     return users.map((user) => UserEntity.reconstitute({ ...user }));
   }
 
@@ -18,8 +17,21 @@ export class SQLiteUserRepository implements UserRepository {
     const user = await this.dataSource
       .getRepository(SQLiteUserEntity)
       .findOne({ where: { id } });
-
     return user ? UserEntity.reconstitute({ ...user }) : undefined;
+  }
+
+  public async getUserByUsername(username: string): Promise<UserEntity | undefined> {
+    const user = await this.dataSource
+      .getRepository(SQLiteUserEntity)
+      .findOne({ where: { username } });
+    return user ? UserEntity.reconstitute({ ...user }) : undefined;
+  }
+
+  public async getUsersByRole(role: string): Promise<UserEntity[]> {
+    const users = await this.dataSource
+      .getRepository(SQLiteUserEntity)
+      .find({ where: { role: role as UserRole } });
+    return users.map((user) => UserEntity.reconstitute({ ...user }));
   }
 
   public async createUser(input: UserEntity): Promise<void> {

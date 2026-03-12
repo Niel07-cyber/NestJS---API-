@@ -40,6 +40,12 @@ export class DomainExceptionFilter implements ExceptionFilter {
       INVALID_COMMENT_CONTENT: 400,
       CANNOT_DELETE_COMMENT: 403,
       POST_NOT_ACCEPTED: 403,
+      USER_NOT_FOUND: 404,
+      CANNOT_FOLLOW_SELF: 400,
+      ALREADY_FOLLOWING: 409,
+      NOT_FOLLOWING: 404,
+      NOTIFICATION_NOT_FOUND: 404,
+      NOTIFICATION_FORBIDDEN: 403,
     };
     return statusMap[code] || 400;
   }
