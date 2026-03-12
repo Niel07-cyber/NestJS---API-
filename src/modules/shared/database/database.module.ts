@@ -5,6 +5,8 @@ import { SQLitePostEntity } from '../../posts/infrastructure/entities/post.sqlit
 import { SQLiteUserEntity } from '../../users/infrastructure/entities/user.sqlite.entity';
 import { SQLiteTagEntity } from '../../tags/infrastructure/entities/tag.sqlite.entity';
 import { SQLiteCommentEntity } from '../../comments/infrastructure/entities/comment.sqlite.entity';
+import { SQLiteSubscriptionEntity } from '../../subscriptions/infrastructure/entities/subscription.sqlite.entity';
+import { SQLiteNotificationEntity } from '../../notifications/infrastructure/entities/notification.sqlite.entity';
 
 @Module({
   imports: [
@@ -14,7 +16,14 @@ import { SQLiteCommentEntity } from '../../comments/infrastructure/entities/comm
       useFactory: (configService: ConfigService) => ({
         type: 'sqlite',
         database: configService.get<string>('DATABASE_URL'),
-        entities: [SQLitePostEntity, SQLiteUserEntity, SQLiteTagEntity, SQLiteCommentEntity],
+        entities: [
+          SQLitePostEntity,
+          SQLiteUserEntity,
+          SQLiteTagEntity,
+          SQLiteCommentEntity,
+          SQLiteSubscriptionEntity,
+          SQLiteNotificationEntity,
+        ],
         synchronize: true,
       }),
     }),

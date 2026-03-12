@@ -97,10 +97,13 @@ public async getPost(
   }
 
   @Delete(':id')
-  public async deletePost(@Param('id') id: string) {
-    return this.deletePostUseCase.execute(id);
-  }
-
+@UseGuards(JwtAuthGuard)
+public async deletePost(
+  @Requester() user: UserEntity,
+  @Param('id') id: string,
+) {
+  return this.deletePostUseCase.execute(id, user);
+}
   @Post(':id/submit-for-review')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
