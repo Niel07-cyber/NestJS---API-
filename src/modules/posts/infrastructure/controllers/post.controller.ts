@@ -10,7 +10,7 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { JwtAuthOptionalGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth-optional.guard';
@@ -78,6 +78,7 @@ export class PostController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new post' })
+  @ApiBody({ schema: { properties: { title: { type: 'string' }, content: { type: 'string' }, slug: { type: 'string' } }, required: ['title', 'content'] } })
   @ApiResponse({ status: 201, description: 'Post created' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async createPost(
