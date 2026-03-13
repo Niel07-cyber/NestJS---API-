@@ -8,6 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
@@ -15,6 +16,8 @@ import { GetNotificationsUseCase } from '../../application/use-cases/get-notific
 import { MarkNotificationReadUseCase } from '../../application/use-cases/mark-notification-read.use-case';
 import { MarkAllNotificationsReadUseCase } from '../../application/use-cases/mark-all-notifications-read.use-case';
 
+@ApiTags('Notifications')
+@ApiBearerAuth()
 @Controller('notifications')
 export class NotificationController {
   constructor(
@@ -25,6 +28,11 @@ export class NotificationController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my notifications' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'pageSize', required: false })
+  @ApiQuery({ name: 'isRead', required: false, enum: ['true', 'false', 'all'] })
+  @ApiResponse({ status: 200, description: 'Returns paginated notifications' })
   public async getNotifications(
     @Requester() user: UserEntity,
     @Query('page') page?: string,
@@ -41,6 +49,9 @@ export class NotificationController {
 
   @Patch(':id/read')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Mark notification as read' })
+  @ApiResponse({ status: 200, description: 'Notification marked as read' })
+  @ApiResponse({ status: 404, description: 'Notification not found' })
   public async markAsRead(
     @Requester() user: UserEntity,
     @Param('id') id: string,
@@ -51,6 +62,8 @@ export class NotificationController {
   @Post('mark-all-read')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
+  @ApiOperation({ summary: 'Mark all notifications as read' })
+  @ApiResponse({ status: 200, description: 'Returns count of marked notifications' })
   public async markAllAsRead(@Requester() user: UserEntity) {
     return this.markAllNotificationsReadUseCase.execute(user.id);
   }

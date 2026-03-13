@@ -8,6 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
@@ -16,6 +17,7 @@ import { UnfollowUserUseCase } from '../../application/use-cases/unfollow-user.u
 import { GetFollowersUseCase } from '../../application/use-cases/get-followers.use-case';
 import { GetFollowingUseCase } from '../../application/use-cases/get-following.use-case';
 
+@ApiTags('Subscriptions')
 @Controller('users')
 export class SubscriptionController {
   constructor(
@@ -27,7 +29,12 @@ export class SubscriptionController {
 
   @Post(':userId/follow')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(200)
+  @ApiOperation({ summary: 'Follow a user' })
+  @ApiResponse({ status: 200, description: 'User followed' })
+  @ApiResponse({ status: 400, description: 'Cannot follow yourself' })
+  @ApiResponse({ status: 409, description: 'Already following' })
   public async follow(
     @Requester() user: UserEntity,
     @Param('userId') userId: string,
@@ -37,7 +44,11 @@ export class SubscriptionController {
 
   @Delete(':userId/follow')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Unfollow a user' })
+  @ApiResponse({ status: 204, description: 'User unfollowed' })
+  @ApiResponse({ status: 404, description: 'Not following this user' })
   public async unfollow(
     @Requester() user: UserEntity,
     @Param('userId') userId: string,
@@ -46,6 +57,10 @@ export class SubscriptionController {
   }
 
   @Get(':userId/followers')
+  @ApiOperation({ summary: 'Get followers of a user' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'pageSize', required: false })
+  @ApiResponse({ status: 200, description: 'Returns paginated followers' })
   public async getFollowers(
     @Param('userId') userId: string,
     @Query('page') page?: string,
@@ -59,6 +74,10 @@ export class SubscriptionController {
   }
 
   @Get(':userId/following')
+  @ApiOperation({ summary: 'Get users that a user is following' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'pageSize', required: false })
+  @ApiResponse({ status: 200, description: 'Returns paginated following' })
   public async getFollowing(
     @Param('userId') userId: string,
     @Query('page') page?: string,

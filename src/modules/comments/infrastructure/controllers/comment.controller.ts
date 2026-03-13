@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
@@ -19,6 +20,7 @@ import { UpdateCommentUseCase } from '../../application/use-cases/update-comment
 import { DeleteCommentUseCase } from '../../application/use-cases/delete-comment.use-case';
 import { GetCommentCountUseCase } from '../../application/use-cases/get-comment-count.use-case';
 
+@ApiTags('Comments')
 @Controller()
 export class CommentController {
   constructor(
@@ -31,6 +33,11 @@ export class CommentController {
 
   @Post('posts/:postId/comments')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a comment on a post' })
+  @ApiResponse({ status: 201, description: 'Comment created' })
+  @ApiResponse({ status: 403, description: 'Post is not accepted' })
+  @ApiResponse({ status: 404, description: 'Post not found' })
   public async createComment(
     @Requester() user: UserEntity,
     @Param('postId') postId: string,
@@ -47,11 +54,19 @@ export class CommentController {
   }
 
   @Get('posts/:postId/comments/count')
+  @ApiOperation({ summary: 'Get comment count for a post' })
+  @ApiResponse({ status: 200, description: 'Returns comment count' })
   public async getCommentCount(@Param('postId') postId: string) {
     return this.getCommentCountUseCase.execute(postId);
   }
 
   @Get('posts/:postId/comments')
+  @ApiOperation({ summary: 'List comments for a post' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'pageSize', required: false })
+  @ApiQuery({ name: 'sortBy', required: false, enum: ['createdAt', 'updatedAt'] })
+  @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'] })
+  @ApiResponse({ status: 200, description: 'Returns paginated comments' })
   public async getComments(
     @Param('postId') postId: string,
     @Query('page') page?: string,
@@ -70,6 +85,10 @@ export class CommentController {
 
   @Patch('comments/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a comment (author only)' })
+  @ApiResponse({ status: 200, description: 'Comment updated' })
+  @ApiResponse({ status: 403, description: 'Not the comment author' })
   public async updateComment(
     @Requester() user: UserEntity,
     @Param('id') id: string,
@@ -80,7 +99,11 @@ export class CommentController {
 
   @Delete('comments/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete a comment' })
+  @ApiResponse({ status: 204, description: 'Comment deleted' })
+  @ApiResponse({ status: 403, description: 'Not authorized to delete' })
   public async deleteComment(
     @Requester() user: UserEntity,
     @Param('id') id: string,

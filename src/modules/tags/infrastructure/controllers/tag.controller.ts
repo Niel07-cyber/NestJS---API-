@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
@@ -21,6 +22,7 @@ import { ListTagsUseCase } from '../../application/use-cases/list-tags.use-case'
 import { AddTagToPostUseCase } from '../../application/use-cases/add-tag-to-post.use-case';
 import { RemoveTagFromPostUseCase } from '../../application/use-cases/remove-tag-from-post.use-case';
 
+@ApiTags('Tags')
 @Controller()
 export class TagController {
   constructor(
@@ -33,6 +35,8 @@ export class TagController {
   ) {}
 
   @Get('tags')
+  @ApiOperation({ summary: 'List all tags' })
+  @ApiResponse({ status: 200, description: 'Returns all tags' })
   public async listTags() {
     const tags = await this.listTagsUseCase.execute();
     return { tags: tags.map((t) => t.toJSON()) };
@@ -40,6 +44,10 @@ export class TagController {
 
   @Post('tags')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a tag (admin only)' })
+  @ApiResponse({ status: 201, description: 'Tag created' })
+  @ApiResponse({ status: 409, description: 'Tag already exists' })
   public async createTag(
     @Requester() user: UserEntity,
     @Body() input: CreateTagDto,
@@ -50,6 +58,10 @@ export class TagController {
 
   @Patch('tags/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a tag (admin only)' })
+  @ApiResponse({ status: 200, description: 'Tag updated' })
+  @ApiResponse({ status: 404, description: 'Tag not found' })
   public async updateTag(
     @Requester() user: UserEntity,
     @Param('id') id: string,
@@ -61,7 +73,11 @@ export class TagController {
 
   @Delete('tags/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete a tag (admin only)' })
+  @ApiResponse({ status: 204, description: 'Tag deleted' })
+  @ApiResponse({ status: 404, description: 'Tag not found' })
   public async deleteTag(
     @Requester() user: UserEntity,
     @Param('id') id: string,
@@ -71,7 +87,11 @@ export class TagController {
 
   @Post('posts/:postId/tags/:tagId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(200)
+  @ApiOperation({ summary: 'Add tag to post (author or admin)' })
+  @ApiResponse({ status: 200, description: 'Tag added to post' })
+  @ApiResponse({ status: 409, description: 'Tag already associated' })
   public async addTagToPost(
     @Requester() user: UserEntity,
     @Param('postId') postId: string,
@@ -83,7 +103,10 @@ export class TagController {
 
   @Delete('posts/:postId/tags/:tagId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(204)
+  @ApiOperation({ summary: 'Remove tag from post (author or admin)' })
+  @ApiResponse({ status: 204, description: 'Tag removed from post' })
   public async removeTagFromPost(
     @Requester() user: UserEntity,
     @Param('postId') postId: string,
