@@ -20,7 +20,6 @@ describe('Medium-like API (e2e)', () => {
     app.useGlobalFilters(new DomainExceptionFilter());
     await app.init();
 
-    // Login with seed users
     const writerLogin = await request(app.getHttpServer())
       .post('/auth/login')
       .send({ username: 'writer_user', password: 'password123' });
@@ -33,7 +32,11 @@ describe('Medium-like API (e2e)', () => {
   }, 30000);
 
   afterAll(async () => {
-    if (app) await app.close();
+    if (app) {
+      // Wait for pending async events to complete before closing
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await app.close();
+    }
   });
 
   it('/ (GET) should return Hello World', () => {

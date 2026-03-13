@@ -12,6 +12,6 @@ export class LogPostCreatedEventHandler {
 
   @OnEvent(PostCreatedEvent)
   public handle(payload: PostCreatedEventPayload) {
-    this.loggingService.log(payload);
+    this.loggingService.log(`Post created: postId=${payload.postId}, authorId=${payload.authorId}`);
   }
 }
