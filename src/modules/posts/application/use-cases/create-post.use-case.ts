@@ -17,15 +17,13 @@ export class CreatePostUseCase {
     private readonly postRepository: PostRepository,
   ) {}
 
-  public async execute(input: CreatePostDto, user: UserEntity): Promise<void> {
+  public async execute(input: CreatePostDto, user: UserEntity): Promise<PostEntity> {
     if (!user.permissions.posts.canCreate()) {
       throw new UserCannotCreatePostException();
     }
 
-    
     let slug: string;
     if (input.slug) {
-     
       if (!PostSlug.validate(input.slug)) {
         throw new InvalidSlugException();
       }
@@ -35,9 +33,7 @@ export class CreatePostUseCase {
       }
       slug = input.slug;
     } else {
-
       slug = PostSlug.generate(input.title);
-     
       let candidate = slug;
       let counter = 2;
       while (await this.postRepository.findBySlug(candidate)) {
@@ -53,5 +49,7 @@ export class CreatePostUseCase {
       postId: post.id,
       authorId: input.authorId,
     });
+
+    return post;
   }
 }

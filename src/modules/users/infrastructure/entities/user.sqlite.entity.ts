@@ -9,7 +9,7 @@ export class SQLiteUserEntity {
   @Column()
   username: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   role: UserRole;
 
   @Column()

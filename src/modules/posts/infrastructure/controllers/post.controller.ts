@@ -84,10 +84,11 @@ export class PostController {
     @Requester() user: UserEntity,
     @Body() input: Omit<CreatePostDto, 'authorId'>,
   ) {
-    return this.createPostUseCase.execute(
+    const post = await this.createPostUseCase.execute(
       { ...input, authorId: user.id },
       user,
     );
+    return { ...post.toJSON(), author: { id: user.id, username: (user.toJSON() as any).username } };
   }
 
   @Patch(':id/slug')
