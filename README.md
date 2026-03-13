@@ -1,9 +1,15 @@
 # Medium-like API - Software Architecture Final Project
 
+A NestJS REST API extending a Medium-like platform with Tags, Post Slugs, Comments, and Subscriptions & Notifications features.
+
+## Prerequisites
+- Node.js v18+
+- npm v9+
+
 ## Tech Stack
 - NestJS, TypeORM, SQLite, EventEmitter2, JWT/Passport
 
-## Setup
+## Installation
 ```bash
 npm install
 ```
@@ -26,6 +32,9 @@ npm run build
 npm run start:prod
 ```
 
+## API Documentation
+Swagger UI available at: `http://localhost:3000/api`
+
 ## Seed the database
 ```bash
 npm run seed
@@ -38,6 +47,18 @@ npm run seed
 | writer_user | password123 | writer |
 | moderator_user | password123 | moderator |
 | admin_user | password123 | admin |
+
+## Running tests
+```bash
+# Unit tests
+npm run test
+
+# E2E integration tests
+npm run test:e2e
+
+# Coverage report
+npm run test:cov
+```
 
 ## Features Implemented
 
@@ -53,7 +74,7 @@ npm run seed
 ### Feature 2: Post Slugs
 - Auto-generated from title on creation
 - Unique enforcement with -2, -3 suffix
-- `GET /posts/:slug` — Get post by slug
+- `GET /posts/:idOrSlug` — Get post by ID or slug
 - `PATCH /posts/:id/slug` — Manual slug override
 
 ### Feature 3: Comments
@@ -71,8 +92,3 @@ npm run seed
 - `GET /notifications` — Get my notifications
 - `PATCH /notifications/:id/read` — Mark as read
 - `POST /notifications/mark-all-read` — Mark all as read
-
-## Running tests
-```bash
-npm run test
-```
