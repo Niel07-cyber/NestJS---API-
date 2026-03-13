@@ -14,4 +14,7 @@ export class SQLiteUserEntity {
 
   @Column()
   password: string;
+
+  @Column({ nullable: true })
+  email: string;
 }
